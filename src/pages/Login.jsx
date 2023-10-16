@@ -1,58 +1,63 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import Diary from '../assets/images/diaryBackground.jpeg'
+import { useRecoilValue } from "recoil";
+import { userListData } from "../util/atom";
+
 const Login = () => {
-    const navigation = useNavigate();
-    const [background, setBackground] = useState(false);
-    const [userData, setUserData] = useState({
-        id: '',
-        password: '',
-    });
-    const [userList, setUserList] = useState([])
+  const navigation = useNavigate();
 
-    const { id, password } = userData;
-    const inputData = (e) => {
-        const { name, value } = e.target;
-        setUserData({
-            ...userData,
-            [name]: value
-        })
+  const [background, setBackground] = useState(false);
+  const [userData, setUserData] = useState({
+    id: '',
+    password: '',
+  });
+
+  const { id, password } = userData;
+  const searchPassword = JSON.parse(localStorage.getItem(id));
+
+  const inputData = (e) => {
+    const { name, value } = e.target;
+    setUserData({
+      ...userData,
+      [name]: value
+    })
+  }
+
+  const logIn = () => {
+    if (localStorage.getItem(id) && searchPassword.password === password) {
+      navigation('/MainPage', id)
+    } else {
+      alert('아이디 또는 비밀번호를 확인해주세요')
     }
+  }
 
-    const saveUserData = () => {
-        setUserList(prev => [...prev, userData.id])
-        userList.filter(item => {
-            if (item === userData.id) {
-                console.log('User already exists!')
-            } else {
-                localStorage.setItem(`${id}`, JSON.stringify(userData));
-            }
-        })
-        navigation('/MainPage');
-    }
+  const goAssign = () => {
+    navigation('/Signup')
+  }
 
-    useEffect(() => {
-        console.log("userData: ", userData);
-        console.log("userList: ", userList)
-    }, [userData, userList])
-    return (
-        <Wrapper isdark={background.toString()}>
-            {/* <img src={Diary} alt="이미지" /> */}
-            <Loginbox>
-                <div className="headerContainer">
-                    <Diarytitle>나만의 일기장 만들기</Diarytitle><ChangeTheme onClick={() => setBackground(!background)} >darkmode</ChangeTheme>
-                </div>
-                <div className="bodyConatiner">
-                    <div className="Id">ID</div>
-                    <Inputcontainer name='id' value={id} type="ID" required onChange={inputData} />
-                    <div className="Password">Password</div>
-                    <Inputcontainer name="password" value={password} type="password" required onChange={inputData} />
-                </div>
-                <Assignbutton onClick={saveUserData}>로그인</Assignbutton>
-            </Loginbox>
-        </Wrapper>
-    );
+  // useEffect(() => {
+  //   console.log("searchPassword: ", searchPassword);
+  //   console.log("userData: ", userData);
+  // }, [userData])
+
+  return (
+    <Wrapper isdark={background.toString()}>
+      <Loginbox>
+        <div className="headerContainer">
+          <Diarytitle>나만의 일기장 만들기</Diarytitle><ChangeTheme onClick={() => setBackground(!background)}>darkmode</ChangeTheme>
+        </div>
+        <div className="bodyConatiner">
+          <div className="Id">ID</div>
+          <Inputcontainer name='id' value={id} type="ID" required onChange={inputData} />
+          <div className="Password">Password</div>
+          <Inputcontainer name="password" value={password} type="password" required onChange={inputData} />
+        </div>
+        <LoginButton onClick={logIn}>로그인</LoginButton>
+        <AssignButton onClick={goAssign}>회원 가입</AssignButton>
+      </Loginbox>
+    </Wrapper>
+  );
 }
 
 export default Login;
@@ -63,8 +68,7 @@ const Wrapper = styled.div`
   height: 100vh;
   align-items: center;
   justify-content: center;
-  ${(props) => props.isdark === 'true' ? 'background-color: #A4A4A4' : 'background-color: white'}
-  background-image: url('../assets/images/diaryBackground.jpeg');
+  ${(props) => props.isdark === "true" ? 'background-color: #757674' : 'background-color: white'}
 `;
 
 const Loginbox = styled.div`
@@ -109,7 +113,12 @@ const Inputcontainer = styled.input`
   height: 3vh;
 `;
 
-const Assignbutton = styled.button`
+const LoginButton = styled.button`
+  width: 20vw;
+  height: 5vh;
+`
+
+const AssignButton = styled.button`
   width: 20vw;
   height: 5vh;
 `
