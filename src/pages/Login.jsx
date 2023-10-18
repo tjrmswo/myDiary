@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { userListData } from "../util/atom";
+import { useRecoilState } from "recoil";
+import { currentId } from "../util/atom";
 
 const Login = () => {
   const navigation = useNavigate();
@@ -12,6 +12,7 @@ const Login = () => {
     id: '',
     password: '',
   });
+  const [currentUser, setCurrentUser] = useRecoilState(currentId);
 
   const { id, password } = userData;
   const searchPassword = JSON.parse(localStorage.getItem(id));
@@ -26,7 +27,9 @@ const Login = () => {
 
   const logIn = () => {
     if (localStorage.getItem(id) && searchPassword.password === password) {
-      navigation('/MainPage', id)
+      localStorage.setItem(`cnt${id}`, id);
+      setCurrentUser(id);
+      navigation('/MainPage')
     } else {
       alert('아이디 또는 비밀번호를 확인해주세요')
     }
@@ -36,10 +39,10 @@ const Login = () => {
     navigation('/Signup')
   }
 
-  // useEffect(() => {
-  //   console.log("searchPassword: ", searchPassword);
-  //   console.log("userData: ", userData);
-  // }, [userData])
+  useEffect(() => {
+    console.log("id: ", id);
+    console.log("currentUser: ", currentUser);
+  }, [id, currentUser])
 
   return (
     <Wrapper isdark={background.toString()}>
