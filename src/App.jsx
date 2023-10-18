@@ -8,6 +8,7 @@ import { RecoilRoot } from 'recoil';
 import Login from './pages/Login';
 import MainPage from './pages/MainPage';
 import Signup from './pages/Signup';
+import InputDiary from './pages/InputDiary';
 const App = () => {
 
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path='/' element={<Login />} />
         <Route path='/MainPage' element={<MainPage />} />
         <Route path='/Signup' element={<Signup />} />
+        <Route path='/InputDiary' element={<InputDiary />} />
       </Routes>
     </RecoilRoot>
   );
