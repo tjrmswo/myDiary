@@ -1,27 +1,25 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
 //recoil
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot } from "recoil";
 
 //pages
-import Login from './pages/Login';
-import MainPage from './pages/MainPage';
-import Signup from './pages/Signup';
-import InputDiary from './pages/InputDiary';
+import MainPage from "./pages/MainPage";
+import DiaryPage from "./pages/DiaryPage";
+import Signup from "./pages/Signup";
+import InputDiary from "./pages/InputDiary";
 const App = () => {
-
   return (
     <RecoilRoot>
       <Routes>
-        <Route path='/' element={<Login />} />
-        <Route path='/MainPage' element={<MainPage />} />
-        <Route path='/Signup' element={<Signup />} />
-        <Route path='/InputDiary' element={<InputDiary />} />
+        <Route path="/" element={<MainPage />} />
+        <Route path="/DiaryPage" element={<DiaryPage />} />
+        <Route path="/Signup" element={<Signup />} />
+        <Route path="/InputDiary" element={<InputDiary />} />
       </Routes>
     </RecoilRoot>
   );
-}
+};
 
 export default App;
-
