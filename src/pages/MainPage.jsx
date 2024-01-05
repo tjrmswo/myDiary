@@ -1,41 +1,78 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable default-case */
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useState } from "react";
+
+// libraries
 import styled from "styled-components";
-import { useNavigate } from 'react-router';
-import { useRecoilValue } from "recoil";
-import { currentId } from "../util/atom";
+
+//img
+import LogoImg from "../assets/Logo.png";
+import UserImg from "../assets/user_custom.png";
+import LoginBlackImg from "../assets/login_black.png";
+import CalendarImg from "../assets/calendar.png";
+import LocationImg from "../assets/location.png";
+import SearchImg from "../assets/search.png";
+import PlusImg from "../assets/plus.png";
+
+// Components
+import CalendarComponent from "../component/CalendarComponent";
+import SearchComponent from "../component/SearchComponent";
+import WriteDiaryComponent from "../component/WriteDiaryComponent";
 
 const MainPage = () => {
-  const navigation = useNavigate();
-  const [searchData, setSearchData] = useState('');
+  const [pageState, setPageState] = useState();
 
-  //recoil value
-  const currentUser = useRecoilValue(currentId);
+  const showOtherComponent = (e) => {
+    const { name } = e.target;
+    setPageState(name);
+  };
 
-  const getId = (e) => {
-    const getmyDiary = JSON.parse(localStorage.getItem(e.target.value));
-    setSearchData(getmyDiary)
-  }
+  const renderDefaultContent = () => (
+    <div className="row">
+      <LoginImage src={LoginBlackImg} />
+      <div className="signincomment">Sing in to write your diary</div>
+      <SigninButton>Sign in</SigninButton>
+    </div>
+  );
 
-  const goInputDiary = () => {
-    navigation('/InputDiary')
-  }
+  const componentMap = {
+    CalendarComponent: <CalendarComponent />,
+    SearchComponent: <SearchComponent />,
+    WriteDiaryComponent: <WriteDiaryComponent />,
+    renderDefaultContent: renderDefaultContent(),
+  };
 
-  useEffect(() => {
-    console.log(currentUser);
-    console.log("searchData: ", searchData)
-  }, [searchData])
+  const componentToShow = componentMap[pageState];
   return (
     <Wrapper>
-      <Loginbox>
-        <div className='header'>일기 찾기</div>
-        <InputTitelcontainer onChange={getId} />
-        {searchData ?
-          <div className='myDiary'>
-            <GetmyDiary>{searchData.id}{searchData.title}{searchData.detail}</GetmyDiary>
-          </div>
-          : <div>등록된 일기가 없습니다 일기를 등록해주세요!</div>}
-        <button onClick={goInputDiary}>일기 작성</button>
-      </Loginbox>
+      <div className="header">
+        <LogoImage
+          src={LogoImg}
+          name="renderDefaultContent"
+          onClick={showOtherComponent}
+        />
+        <div className="title">MyDiary</div>
+        <UserImage src={UserImg} />
+      </div>
+      <div className="drawer">
+        <LocationImage src={LocationImg} name="Location" />
+        <CalendarImage
+          src={CalendarImg}
+          onClick={showOtherComponent}
+          name="CalendarComponent"
+        />
+        <SearchImage
+          src={SearchImg}
+          onClick={showOtherComponent}
+          name="SearchComponent"
+        />
+        <PlusImage
+          src={PlusImg}
+          onClick={showOtherComponent}
+          name="WriteDiaryComponent"
+        />
+      </div>
+      {componentToShow || renderDefaultContent()}
     </Wrapper>
   );
 };
@@ -46,39 +83,91 @@ const Wrapper = styled.div`
   display: flex;
   width: 100vw;
   height: 100vh;
-  align-items: center;
   justify-content: center;
-  ${(props) => props.isdark === "true" ? 'background-color: #757674' : 'background-color: white'}
-`;
+  /* background-color: #f6fdff; */
 
-const Loginbox = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-
-  box-shadow: 2px 2px 12px gray;
-  background-color: #F2F2F2;
-  width: 38vw;
-  height: 70vh;
-  border-radius: 1em;
-  .header{
-    font-size: 1.5em;
+  .drawer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    left: 0;
+    width: 5vw;
+    height: 100vh;
+    background-color: #232323;
+  }
+  .header {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    width: 100vw;
+    height: 10vh;
+    background-color: #e9f6fb;
+  }
+  .title {
+    font-size: 1.2rem;
+    height: 10vh;
+    display: flex;
+    align-items: center;
+    color: #23b1dc;
     font-weight: bold;
-    margin-bottom: 1rem;
   }
-  .myDiary{
-    flex-direction: row;
-    width: 20vw;
+  .row {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 15rem;
   }
-`
-const InputTitelcontainer = styled.input`
-  width: 30vw;
-  height: 3vh;
-  margin-bottom: 0.5rem;
+  .signincomment {
+    margin-top: 0.5rem;
+    color: gray;
+  }
 `;
 
-const GetmyDiary = styled.div`
-  background-color: #8ba85b;
-`
+const LogoImage = styled.img`
+  width: 4vw;
+  height: 8vh;
+`;
 
+const LoginImage = styled.img`
+  width: 5vw;
+  margin-top: 2rem;
+`;
+
+const UserImage = styled.img`
+  position: absolute;
+  right: 3rem;
+  width: 2.5vw;
+`;
+
+const PlusImage = styled.img`
+  width: 2vw;
+  margin-top: 2rem;
+`;
+
+const CalendarImage = styled.img`
+  width: 2vw;
+  margin-top: 2rem;
+`;
+
+const LocationImage = styled.img`
+  width: 2vw;
+  margin-top: 2rem;
+`;
+
+const SearchImage = styled.img`
+  width: 2vw;
+  margin-top: 2rem;
+`;
+
+const SigninButton = styled.button`
+  width: 6vw;
+  height: 4.5vh;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 1rem;
+  background-color: #23b1dc;
+  color: white;
+`;
