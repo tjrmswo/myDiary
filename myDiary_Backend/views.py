@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -19,10 +19,20 @@ def getDiary(request):
     serializer = diarySerializer(querysot,many=True)
     return Response(serializer.data)
 
+@api_view(['POST'])
+def searchDiary(request):
+    print(request.data.keys())
+    print(request.data.values())
+    if 'diary_title' in request.data.keys() :
+        query = DiarySavetable.objects.filter(diary_title=request.data['diary_title'])
+        serializer =  diarySerializer(query,many=True)
+    return Response(serializer.data)
+
 
 @api_view(['POST'])
 def postDiary(request):
     diary = diarySerializer(data=request.data)
+    print(request.data)
     if diary.is_valid():
         diary.save()
         return Response(diary.data)
