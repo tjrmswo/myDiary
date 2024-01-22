@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class DiarySavetable(models.Model):
     diary_uuid = models.CharField(db_column='Diary_uuid', primary_key=True, max_length=45)  # Field name made lowercase.

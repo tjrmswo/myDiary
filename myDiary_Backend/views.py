@@ -1,8 +1,11 @@
+import os
 from django.shortcuts import render
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, HttpRequest
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+import requests
+
 
 from .serializer import diarySerializer
 from .models import DiarySavetable
@@ -28,6 +31,25 @@ def searchDiary(request):
         serializer =  diarySerializer(query,many=True)
     return Response(serializer.data)
 
+@api_view(['POST'])
+def postKaKaocode(request):
+    data = {
+        "grant_type":'authorization_code',
+        "client_id": os.getenv('REST_API_KEY'),
+        "redirect_uri": "http://localhost:3000",
+        "code": request.data["code"]
+    }
+    kakao_token_api = "https://kauth.kakao.com/oauth/token"
+    access_token = requests.post(kakao_token_api, data=data).json()["access_token"]
+
+    kakao_user_api = "https://kapi.kakao.com/v2/user/me"
+    header = {"Authorization": f"Bearer {access_token}"}
+    user_info = requests.get(kakao_user_api, headers=header).json()
+    response_data = {
+        "user_info": user_info
+    }
+    print(user_info)
+    return Response(user_info, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def postDiary(request):

@@ -7,4 +7,5 @@ urlpatterns = [
     path('getDiary/',views.getDiary),
     path('postDiary/',views.postDiary),
     path('searchDiary/',views.searchDiary),
+    path('kakaoLogin/',views.postKaKaocode),
 ]
