@@ -1,9 +1,10 @@
 /* eslint-disable default-case */
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // libraries
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 //img
 import LogoImg from "../assets/Logo.png";
@@ -13,25 +14,114 @@ import CalendarImg from "../assets/calendar.png";
 import LocationImg from "../assets/location.png";
 import SearchImg from "../assets/search.png";
 import PlusImg from "../assets/plus.png";
+import CalendarLightgreenImg from "../assets/calendar_lightgreen.png";
+import LocationLightgreenImg from "../assets/location_lightgreen.png";
+import SearchLightgreenImg from "../assets/search_lightgreen.png";
+import PlusLightgreenImg from "../assets/plus_ligthgreen.png";
 
 // Components
 import CalendarComponent from "../component/CalendarComponent";
 import SearchComponent from "../component/SearchComponent";
 import WriteDiaryComponent from "../component/WriteDiaryComponent";
+import axios from "axios";
+
+// customhooks
+import useKaKaoLogin from "../hooks/useKaKaoLogin";
 
 const MainPage = () => {
+  const navigation = useNavigate();
+  // const [isAuth, setIsAuth] = useState(false);
   const [pageState, setPageState] = useState();
+  const [clickedPageState, setClickedPageState] = useState([]);
+  const [activeComponent, setActiveComponent] = useState("");
+  const [location, setLocation] = useState({
+    lat: 0,
+    long: 0,
+  });
+  const [test, setText] = useState([]);
+  const [userInfo, setUserInfo] = useState();
+  const [Authorization, setAuthorization] = useKaKaoLogin({
+    rest_api_key: process.env.REACT_APP_REST_API_KEY,
+    redirect_uri: process.env.REACT_APP_REDIRECTION_URI,
+  });
+
+  const getKakoautho = async () => {
+    // setAuthorization();
+    const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECTION_URI}&response_type=code`;
+    window.location.href = kakaoURL;
+    const code = new URL(window.location.href).searchParams.get("code");
+
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/myDiary_Backend/kakaoLogin/",
+        {
+          code: code,
+        }
+      );
+      // const res = await axios.post("https://kauth.kakao.com/oauth/token", {
+      //   grant_type: "authorization_code",
+      //   client_id: "cbf5e9d6855ac8a3072d3eae8c884c57",
+      //   redirect_uri: "http://localhost:3000",
+      //   code: code,
+      // });
+
+      console.log(res);
+    } catch (e) {
+      console.log("KaKao Login failed", e);
+    }
+  };
 
   const showOtherComponent = (e) => {
     const { name } = e.target;
     setPageState(name);
+    setActiveComponent(name);
+    if (clickedPageState.includes(name)) {
+      setClickedPageState((prevData) =>
+        prevData.filter((item) => item !== name)
+      );
+    } else {
+      setClickedPageState((prevData) => [...prevData, name]);
+    }
+
+    if (name === "Location") {
+      const options = {
+        timeout: 5000,
+      };
+      const watchID = navigator.geolocation.getCurrentPosition(
+        success,
+        error,
+        options
+      );
+
+      function success({ coords }) {
+        console.log(coords);
+        setLocation(coords.latitude, coords.longitude);
+        // getAddress(coords.latitude, coords.longitude);
+      }
+      function error(err) {
+        console.log(err);
+      }
+    }
   };
+
+  // const getAddress = async (latitude, longitude) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://api.vworld.kr/req/address?service=address&request=getAddress&version=2.0&crs=epsg:4326&point=${longitude},${latitude}&format=xml&type=both&zipcode=true&simple=false&key=${process.env.REACT_APP_SEARCH_API_KEY}`
+  //     );
+  //     console.log(response);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   const renderDefaultContent = () => (
     <div className="row">
       <LoginImage src={LoginBlackImg} />
       <div className="signincomment">Sing in to write your diary</div>
-      <SigninButton>Sign in</SigninButton>
+      <SigninButton onClick={() => getKakoautho()}>Sign in</SigninButton>
+      {/* <div>RestAPI Demo</div>
+      <button onClick={getAddress}>Get</button> */}
     </div>
   );
 
@@ -43,6 +133,12 @@ const MainPage = () => {
   };
 
   const componentToShow = componentMap[pageState];
+
+  useEffect(() => {
+    console.log("pageState: ", pageState);
+    console.log("clickedPageState: ", clickedPageState);
+  }, [pageState, clickedPageState]);
+
   return (
     <Wrapper>
       <div className="header">
@@ -55,19 +151,39 @@ const MainPage = () => {
         <UserImage src={UserImg} />
       </div>
       <div className="drawer">
-        <LocationImage src={LocationImg} name="Location" />
+        <LocationImage
+          src={
+            clickedPageState.includes("Location") === true
+              ? LocationLightgreenImg
+              : LocationImg
+          }
+          name="Location"
+          onClick={showOtherComponent}
+        />
         <CalendarImage
-          src={CalendarImg}
+          src={
+            activeComponent.includes("CalendarComponent")
+              ? CalendarLightgreenImg
+              : CalendarImg
+          }
           onClick={showOtherComponent}
           name="CalendarComponent"
         />
         <SearchImage
-          src={SearchImg}
+          src={
+            activeComponent.includes("SearchComponent")
+              ? SearchLightgreenImg
+              : SearchImg
+          }
           onClick={showOtherComponent}
           name="SearchComponent"
         />
         <PlusImage
-          src={PlusImg}
+          src={
+            activeComponent.includes("WriteDiaryComponent")
+              ? PlusLightgreenImg
+              : PlusImg
+          }
           onClick={showOtherComponent}
           name="WriteDiaryComponent"
         />
@@ -84,7 +200,6 @@ const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
   justify-content: center;
-  /* background-color: #f6fdff; */
 
   .drawer {
     position: absolute;

@@ -3,6 +3,7 @@ import "../font.css";
 
 // libraries
 import styled, { css } from "styled-components";
+import axios from "axios";
 
 // img
 import Search from "../assets/searchbutton.png";
@@ -23,7 +24,20 @@ const SearchComponent = () => {
     const { value } = e.target;
     setSearchDiary(value);
   };
-  const searchData = () => {};
+  const searchData = async () => {
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/myDiary_Backend/searchDiary/",
+        {
+          diary_title: searchDiary,
+          tags: tags,
+        }
+      );
+      console.log(res.data);
+    } catch (err) {
+      console.log(err.config);
+    }
+  };
   const selectTags = (tagName) => {
     setTags((pre) => [...pre, tagName]);
   };
