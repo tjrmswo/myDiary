@@ -42,7 +42,7 @@ const MainPage = () => {
     rest_api_key: process.env.REACT_APP_REST_API_KEY,
     redirect_uri: process.env.REACT_APP_REDIRECTION_URI,
   });
-
+  console.log("PR템플릿");
   const fetchUserInfo = () => {
     setIsAuth(true);
     if (isAuth) {
