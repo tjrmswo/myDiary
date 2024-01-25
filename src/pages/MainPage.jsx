@@ -103,6 +103,17 @@ const MainPage = () => {
     }
   };
 
+  // const getAddress = async (latitude, longitude) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://api.vworld.kr/req/address?service=address&request=getAddress&version=2.0&crs=epsg:4326&point=${longitude},${latitude}&format=xml&type=both&zipcode=true&simple=false&key=${process.env.REACT_APP_SEARCH_API_KEY}`
+  //     );
+  //     console.log(response);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
   const renderDefaultContent = () => (
     <div className="row">
       <LoginImage src={LoginBlackImg} />
@@ -125,7 +136,6 @@ const MainPage = () => {
     console.log("clickedPageState: ", clickedPageState);
     console.log("userInfos:", userInfo);
   }, [pageState, clickedPageState, userInfo]);
-
   return (
     <Wrapper>
       <div className="header">
