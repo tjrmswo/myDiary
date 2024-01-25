@@ -26,11 +26,10 @@ import WriteDiaryComponent from "../component/WriteDiaryComponent";
 import axios from "axios";
 
 // customhooks
-import useKaKaoLogin from "../hooks/useKaKaoLogin";
+import useKakaoLogin from "../hooks/useKakaoLogin";
 
 const MainPage = () => {
-  const navigation = useNavigate();
-  // const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
   const [pageState, setPageState] = useState();
   const [clickedPageState, setClickedPageState] = useState([]);
   const [activeComponent, setActiveComponent] = useState("");
@@ -38,36 +37,36 @@ const MainPage = () => {
     lat: 0,
     long: 0,
   });
-  const [test, setText] = useState([]);
   const [userInfo, setUserInfo] = useState();
-  const [Authorization, setAuthorization] = useKaKaoLogin({
+  const [Authorization, setAuthorization] = useKakaoLogin({
     rest_api_key: process.env.REACT_APP_REST_API_KEY,
     redirect_uri: process.env.REACT_APP_REDIRECTION_URI,
   });
 
-  const getKakoautho = async () => {
-    // setAuthorization();
-    const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECTION_URI}&response_type=code`;
-    window.location.href = kakaoURL;
+  const fetchUserInfo = () => {
+    setIsAuth(true);
+    if (isAuth) {
+      const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECTION_URI}&response_type=code`;
+      window.location.href = kakaoURL;
+    }
+  };
+  const getKakoauth = async () => {
+    fetchUserInfo();
     const code = new URL(window.location.href).searchParams.get("code");
-
-    try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/myDiary_Backend/kakaoLogin/",
-        {
-          code: code,
-        }
-      );
-      // const res = await axios.post("https://kauth.kakao.com/oauth/token", {
-      //   grant_type: "authorization_code",
-      //   client_id: "cbf5e9d6855ac8a3072d3eae8c884c57",
-      //   redirect_uri: "http://localhost:3000",
-      //   code: code,
-      // });
-
-      console.log(res);
-    } catch (e) {
-      console.log("KaKao Login failed", e);
+    if (code) {
+      try {
+        const res = await axios.post(
+          "http://127.0.0.1:8000/myDiary_Backend/kakaoLogin/",
+          {
+            code: code,
+          }
+        );
+        setUserInfo((prevUserInfo) => {
+          return { ...prevUserInfo, ...res };
+        });
+      } catch (e) {
+        console.log("Kakao Login failed", e);
+      }
     }
   };
 
@@ -119,9 +118,7 @@ const MainPage = () => {
     <div className="row">
       <LoginImage src={LoginBlackImg} />
       <div className="signincomment">Sing in to write your diary</div>
-      <SigninButton onClick={() => getKakoautho()}>Sign in</SigninButton>
-      {/* <div>RestAPI Demo</div>
-      <button onClick={getAddress}>Get</button> */}
+      <SigninButton onClick={() => getKakoauth()}>Sign in</SigninButton>
     </div>
   );
 
@@ -137,8 +134,8 @@ const MainPage = () => {
   useEffect(() => {
     console.log("pageState: ", pageState);
     console.log("clickedPageState: ", clickedPageState);
-  }, [pageState, clickedPageState]);
-
+    console.log("userInfos:", userInfo);
+  }, [pageState, clickedPageState, userInfo]);
   return (
     <Wrapper>
       <div className="header">
@@ -148,7 +145,11 @@ const MainPage = () => {
           onClick={showOtherComponent}
         />
         <div className="title">MyDiary</div>
-        <UserImage src={UserImg} />
+        {userInfo ? (
+          <KakaoProfile src={userInfo.data.properties.profile_image} />
+        ) : (
+          <UserImage src={UserImg} />
+        )}
       </div>
       <div className="drawer">
         <LocationImage
@@ -255,6 +256,14 @@ const UserImage = styled.img`
   position: absolute;
   right: 3rem;
   width: 2.5vw;
+`;
+
+const KakaoProfile = styled.img`
+  position: absolute;
+  right: 2.5rem;
+  width: 3.5rem;
+  height: 8vh;
+  border-radius: 50%;
 `;
 
 const PlusImage = styled.img`
