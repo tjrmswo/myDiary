@@ -25,7 +25,7 @@ import SearchComponent from "../component/SearchComponent";
 import WriteDiaryComponent from "../component/WriteDiaryComponent";
 import axios from "axios";
 
-// customhooks
+// custom hooks
 import useKakaoLogin from "../hooks/useKakaoLogin";
 
 const MainPage = () => {
