@@ -13,16 +13,18 @@ import moment from "moment";
 import useInputData from "../hooks/useInputData";
 
 // img
-import LocationImg from "../assets/location_black.png";
 import axios from "axios";
+
+//constans
+import { ManyTags } from "../constants/ManyTags";
 
 const WriteDiaryComponent = () => {
   const [diary, setDiary] = useState({
     diary_uuid: "",
-    username: "",
+    diary_userid: "",
     diary_title: "",
     diary_content: "",
-    diary_address: "",
+    diary_emotionid: "",
     diary_date: "",
   });
 
@@ -37,7 +39,13 @@ const WriteDiaryComponent = () => {
       diary_date: e,
     }));
   };
-
+  const getEmotionId = (e) => {
+    const { value } = e.target;
+    setDiary((prev) => ({
+      ...prev,
+      diary_emotionid: value,
+    }));
+  };
   const saveDiary = async () => {
     try {
       const res = await axios.post(
@@ -47,7 +55,7 @@ const WriteDiaryComponent = () => {
           diary_userid: "근재2",
           diary_title: diary_title,
           diary_content: diary_content,
-          diary_emotionid: "",
+          diary_emotionid: diary_emotionid,
           diary_date: moment(diary_date).format("YYYY-MM-DD"),
         }
       );
@@ -57,20 +65,35 @@ const WriteDiaryComponent = () => {
     }
   };
 
-  const { diary_date, diary_title, diary_content } = diary;
+  const { diary_date, diary_title, diary_content, diary_emotionid } = diary;
   return (
     <Container>
       <div className="titleRow">
         <div className="title">Title</div>
-        <Input type="text" name="diary_title" onChange={inputData} />
-        <DatePicker
-          selected={diary_date ? diary_date : new Date()}
-          name="datePicker"
-          type="date"
-          onChange={achieveDate}
-          showIcon
-        />
-        <LocationImage src={LocationImg} />
+        <div className="row">
+          <Input type="text" name="diary_title" onChange={inputData} />
+          <DatePicker
+            selected={diary_date ? diary_date : new Date()}
+            name="datePicker"
+            type="date"
+            onChange={achieveDate}
+            showIcon
+          />
+          <Form action="#">
+            <Selectemotion
+              name="emotions"
+              id="emotions"
+              onChange={getEmotionId}
+            >
+              {ManyTags.map((item, i) => (
+                <option key={i} value={item.emotionid}>
+                  {item.emotion}
+                  {item.emotionIcon}
+                </option>
+              ))}
+            </Selectemotion>
+          </Form>
+        </div>
       </div>
       <div className="titleRow">
         <div className="content">Content</div>
@@ -94,9 +117,10 @@ const Container = styled.div`
     flex-direction: column;
     margin-top: 1.5rem;
   }
-  /* .row {
+  .row {
+    margin-top: 1rem;
     flex-direction: row;
-  } */
+  }
   .title {
     height: 5vh;
     font-size: 1.2rem;
@@ -144,10 +168,12 @@ const Textarea = styled.textarea`
   }
 `;
 
-const LocationImage = styled.img`
+const Form = styled.form`
+  width: 10vw;
   margin-left: 1rem;
-  width: 1.5vw;
-  height: 3vh;
+`;
+const Selectemotion = styled.select`
+  font-family: "GmarketSans-Medium";
 `;
 
 const SaveButton = styled.button`
