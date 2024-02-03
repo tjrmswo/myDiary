@@ -25,12 +25,12 @@ import SearchComponent from "../component/SearchComponent";
 import WriteDiaryComponent from "../component/WriteDiaryComponent";
 import axios from "axios";
 
-// customhooks
+// custom hooks
 import useKakaoLogin from "../hooks/useKakaoLogin";
 
 const MainPage = () => {
   const [isAuth, setIsAuth] = useState(false);
-  const [pageState, setPageState] = useState();
+  const [pageState, setPageState] = useState("");
   const [clickedPageState, setClickedPageState] = useState([]);
   const [activeComponent, setActiveComponent] = useState("");
   const [location, setLocation] = useState({
@@ -81,38 +81,7 @@ const MainPage = () => {
     } else {
       setClickedPageState((prevData) => [...prevData, name]);
     }
-
-    if (name === "Location") {
-      const options = {
-        timeout: 5000,
-      };
-      const watchID = navigator.geolocation.getCurrentPosition(
-        success,
-        error,
-        options
-      );
-
-      function success({ coords }) {
-        console.log(coords);
-        setLocation(coords.latitude, coords.longitude);
-        // getAddress(coords.latitude, coords.longitude);
-      }
-      function error(err) {
-        console.log(err);
-      }
-    }
   };
-
-  // const getAddress = async (latitude, longitude) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://api.vworld.kr/req/address?service=address&request=getAddress&version=2.0&crs=epsg:4326&point=${longitude},${latitude}&format=xml&type=both&zipcode=true&simple=false&key=${process.env.REACT_APP_SEARCH_API_KEY}`
-  //     );
-  //     console.log(response);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   const renderDefaultContent = () => (
     <div className="row">
@@ -152,15 +121,6 @@ const MainPage = () => {
         )}
       </div>
       <div className="drawer">
-        <LocationImage
-          src={
-            clickedPageState.includes("Location") === true
-              ? LocationLightgreenImg
-              : LocationImg
-          }
-          name="Location"
-          onClick={showOtherComponent}
-        />
         <CalendarImage
           src={
             activeComponent.includes("CalendarComponent")
